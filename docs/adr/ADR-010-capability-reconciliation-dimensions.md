@@ -19,6 +19,10 @@ Capability reconciliation uses independent dimensions:
 | supported   | supported   | STALE     | CONSISTENT   | ACCEPTED_WITH_STALE_EVIDENCE |
 | unknown     | supported   | FRESH     | UNKNOWN      | ACCEPTED            |
 | supported   | unavailable | UNKNOWN   | UNKNOWN      | UNRESOLVED                   |
+
+Note: The row `unknown → supported → FRESH → UNKNOWN → ACCEPTED` represents a case where the declared capability is unknown but a fresh observation supports the capability. Consistency is UNKNOWN because there is no declared value to compare against, not because of a conflict. The observation is sufficient to accept the capability.
+
+Similarly, `supported → unavailable → UNKNOWN → UNKNOWN → UNRESOLVED` represents a case where the observation is unavailable; consistency cannot be evaluated because there is no observed value to compare.
 | unsupported | supported   | FRESH     | CONTRADICTED | CONFLICT                     |
 
 Source values (OBSERVED, DECLARED, DERIVED, ASSUMED) are not used as reconciliation outcomes.
@@ -52,6 +56,6 @@ The reconciliation outcome is a separate dimension.
 
 ## References
 
-- ARCHITECTURE.md v0.3
+- ARCHITECTURE.md
 - CAPABILITY_CONTRACT.md
 - domain/capabilities.py

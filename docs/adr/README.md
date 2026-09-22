@@ -72,11 +72,19 @@ Active ADRs are listed below. Superseded ADRs are preserved for historical refer
 
 ## Chronological Ordering
 
-ADRs are listed in canonical order above. Original creation dates are preserved within each ADR file.
+ADRs are listed in canonical order above.
 
 ## Superseded ADRs
 
-No ADRs have been superseded in this collection. All 22 ADRs are active and mutually consistent.
+No ADRs have been superseded in this collection. All 22 ADRs are active. Consistency is maintained through reconciliation and review at phase boundaries.
+
+## Open / Deferred Decisions
+
+The following decisions are intentionally deferred and are not architectural inconsistencies:
+
+- **CUPS/PAPPL final deployment mechanism**: The core maintains the non-root container principle. CUPS/PAPPL adapters may require elevated privileges or device access; the final deployment mechanism is deferred to a future operational ADR.
+- **Multi-tenancy / `tenant_id`**: Reserved for future use. Not implemented in the current scope.
+- **NFR numerical targets**: Latency, throughput, and disaster recovery values are deployment-profile-specific and will be resolved through future operational/deployment ADRs before production deployment.
 
 ## Adding New ADRs
 

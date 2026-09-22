@@ -24,13 +24,25 @@ We adopt a plugin-based provider architecture with a well-defined interface:
 
 ### Provider Interface
 
-The Provider interface includes:
-- `register_printer(printer_config) -> Printer`
-- `unregister_printer(printer_id) -> void`
-- `execute_job(execution) -> ExecutionResult`
-- `cancel_job(execution_id) -> CancellationResult`
-- `observe_printer(printer_id) -> PrinterObservation`
-- `health_check() -> HealthStatus`
+The Provider interface is composed of specialized capability-based interfaces:
+
+- `PrinterDiscoveryProvider`: discovers printers
+- `PrinterCapabilityProvider`: retrieves printer capabilities
+- `PrinterObservationProvider`: retrieves printer observations
+- `PrintSubmissionProvider`: submits print jobs
+- `PrintCancellationProvider`: cancels print jobs
+- `PrinterControlProvider`: sends control operations to printers
+- `SpoolProvider`: stores and retrieves document artifacts
+- `DocumentTransformProvider`: transforms document formats
+- `PrintServerProvider`: interacts with print servers
+
+Key method signatures:
+
+- `submit(job: PrintJob) -> PrintExecution`
+- `cancel(job_id: str) -> bool`
+- `control(printer_id: str, operation: str) -> PrintExecution`
+
+The return type `PrintExecution` represents the execution result for a submission or control operation. It is the concrete implementation of the conceptual `ExecutionAttempt`.
 
 ### Plugin Loading
 

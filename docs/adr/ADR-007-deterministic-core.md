@@ -61,7 +61,7 @@ In deterministic mode:
 
 - The core is tested with property-based frameworks (e.g., QuickCheck, Hypothesis).
 - Properties include:
-  - `transition_state` is total (every valid input produces a valid output).
+  - `validate_job_transition` is total over legal transitions: every legal transition is accepted, every illegal transition is rejected.
   - `match_capabilities` is reflexive and symmetric.
   - `route_job` always returns a printer from the input set.
 

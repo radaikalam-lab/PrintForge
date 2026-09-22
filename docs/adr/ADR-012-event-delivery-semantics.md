@@ -19,6 +19,11 @@ Chosen properties:
 - dead-letter behavior: undeliverable events move to dead-letter queue
 
 Event identity:
+
+This ADR describes delivery semantics. The complete event envelope is defined by the architecture and EVENT_CONTRACT.md.
+
+Delivery-relevant fields:
+
 ```text
 event_id: UUID v7
 schema_version: semver
@@ -28,6 +33,7 @@ correlation_id: UUID | null
 causation_id: UUID | null
 ordering_scope: aggregate_id
 idempotency_key: event_id
+tenant_id: reserved
 ```
 
 Consumers must be idempotent with respect to event_id. Failed deliveries are retried with exponential backoff. Dead-letter queues capture undeliverable events.

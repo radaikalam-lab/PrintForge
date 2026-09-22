@@ -62,6 +62,6 @@ UNKNOWN is not a convenient catch-all state. It represents genuine uncertainty a
 
 ## References
 
-- ARCHITECTURE.md v0.3
+- ARCHITECTURE.md
 - EXECUTION_CONTRACT.md
 - EPISTEMIC_BOUNDARY_CONTRACT.md

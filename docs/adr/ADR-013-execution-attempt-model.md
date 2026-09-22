@@ -28,7 +28,7 @@ PrintJob
 The parent PrintJob represents the logical print request. ExecutionAttempt represents an individual provider/device execution attempt.
 
 Every attempt records:
-- attempt_id
+- attempt_id (conceptual identifier; implemented as `PrintExecution.execution_id` in the current domain model)
 - job_id
 - provider
 - printer_id
@@ -39,6 +39,11 @@ Every attempt records:
 - failure_information
 - provenance
 - correlation_id
+
+Terminology mapping:
+- Conceptual `attempt_id` maps to `PrintExecution.execution_id` in the current implementation.
+- The domain entity `PrintExecution` is the concrete representation of `ExecutionAttempt`.
+- Provider interfaces return `PrintExecution` objects from `submit()` and `control()` methods.
 
 A retry creates a new ExecutionAttempt. The parent PrintJob remains non-terminal while retryable execution attempts exist. Previous attempt history is preserved.
 
@@ -67,7 +72,7 @@ A retry creates a new ExecutionAttempt. The parent PrintJob remains non-terminal
 
 ## References
 
-- ARCHITECTURE.md v0.3
+- ARCHITECTURE.md
 - PRINT_JOB_CONTRACT.md
 - EXECUTION_CONTRACT.md
 - domain/execution.py

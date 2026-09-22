@@ -70,7 +70,7 @@ Provider does not mutate PrintForge domain state
 
 - Clear separation of concerns between software and hardware.
 - Hardware failures are isolated and do not crash the software.
-- The system is safe: it cannot cause physical damage because it never touches hardware directly.
+- The core does not directly manipulate physical hardware. Physical commands are issued only through providers under their respective contracts. Providers are responsible for validating commands against device capabilities and physical safety requirements before transmission. The system does not treat provider reports as authoritative physical truth.
 - Provider reports are correctly treated as observations, not authoritative physical truth.
 
 ### Negative
