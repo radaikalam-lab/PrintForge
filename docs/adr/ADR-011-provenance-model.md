@@ -20,7 +20,7 @@ Every external observation and domain event retains a provenance chain with at m
 | actor | Entity that produced the observation |
 | timestamp | Observation timestamp |
 | correlation_id | Correlation identifier |
-| causal_reference | Causal reference |
+| causal_reference | Domain-level causal chain reference |
 
 TraceContext provides:
 
@@ -32,6 +32,10 @@ TraceContext provides:
 | baggage | Key-value pairs propagated across boundaries |
 
 Provenance is never discarded because data has been normalized. Normalized data and provenance remain separable.
+
+### Causality relationship
+
+Event envelopes use `causation_id` to identify the immediate event cause (see ADR-012). Provenance records use `causal_reference` to capture the domain-level causal chain. When an event causes a provenance-bearing state change, its `causation_id` may populate the corresponding provenance `causal_reference`.
 
 ## Consequences
 

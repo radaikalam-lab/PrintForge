@@ -46,7 +46,7 @@ ADR-009 defers to ADR-010 for the canonical multidimensional reconciliation voca
 ### Negative
 
 - Contradicted printers require operator intervention.
-- Routing must handle CONFLICT status explicitly.
+- Routing must handle printers whose capability reconciliation outcome is CONFLICT.
 
 ### Neutral
 

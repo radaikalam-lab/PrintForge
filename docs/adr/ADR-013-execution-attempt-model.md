@@ -44,6 +44,7 @@ Terminology mapping:
 - Conceptual `attempt_id` maps to `PrintExecution.execution_id` in the current implementation.
 - The domain entity `PrintExecution` is the concrete representation of `ExecutionAttempt`.
 - Provider interfaces return `PrintExecution` objects from `submit()` and `control()` methods.
+- Provider `cancel()` methods return a boolean cancellation result, not a `PrintExecution`.
 
 A retry creates a new ExecutionAttempt. The parent PrintJob remains non-terminal while retryable execution attempts exist. Previous attempt history is preserved.
 

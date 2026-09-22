@@ -19,8 +19,7 @@ We adopt a plugin-based provider architecture with a well-defined interface:
 1. **Provider Interface**: A stable, versioned interface that all providers must implement.
 2. **Plugin Loading**: Providers are loaded dynamically at runtime via plugins.
 3. **Capability Declaration**: Providers declare their supported capabilities at registration time.
-4. **Health Monitoring**: The core monitors provider health and isolates failures.
-5. **Simulator Provider**: A built-in provider for testing and development.
+4. **Simulator Provider**: A built-in provider for testing and development.
 
 ### Provider Interface
 

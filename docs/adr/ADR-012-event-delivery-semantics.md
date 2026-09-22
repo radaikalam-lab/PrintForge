@@ -65,3 +65,4 @@ Consumers must be idempotent with respect to event_id. Failed deliveries are ret
 
 - EVENT_CONTRACT.md
 - FAILURE_CONTRACT.md
+- ADR-011: Provenance Model (for `causal_reference` relationship)
