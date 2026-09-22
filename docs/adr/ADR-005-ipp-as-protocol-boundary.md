@@ -1,4 +1,4 @@
-# ADR-001: IPP as Protocol Boundary
+# ADR-005: IPP as Protocol Boundary
 
 ## Status
 
@@ -12,13 +12,13 @@ We need a clear boundary between the PrintForge core and the diverse printing pr
 
 ## Decision
 
-We define IPP as the canonical protocol boundary. All provider implementations must translate printer-specific protocols to/from IPP semantics before interacting with the PrintForge core.
+We define IPP as the canonical protocol boundary used across the Provider interface. All provider implementations must translate printer-specific protocols to/from IPP semantics before interacting with the PrintForge core.
 
 Specifically:
 
-1. **IPP as Lingua Franca**: IPP 2.0+ is the internal representation of print operations.
-2. **Provider Translation**: Providers translate between printer-native protocols and IPP.
-3. **Core Agnosticism**: The PrintForge core never speaks directly to printers. It only speaks IPP via the Provider interface.
+1. **IPP as Lingua Franca**: IPP 2.0+ is the canonical internal representation used across the provider boundary for standard printer operations.
+2. **Provider Translation**: Providers translate between printer-native protocols and IPP. Non-IPP devices are handled by provider-specific bridges or adapters.
+3. **Core Agnosticism**: The PrintForge core communicates with printer integrations only through the Provider interface. It does not speak IPP directly, nor does it depend on IPP libraries in the domain layer.
 4. **Capability Mapping**: Printer capabilities are mapped to IPP attributes (e.g., `printer-resolution`, `sides`).
 
 ## Consequences

@@ -1,4 +1,4 @@
-# ADR-007: Event Delivery Semantics
+# ADR-012: Event Delivery Semantics
 
 ## Status
 
@@ -25,7 +25,7 @@ schema_version: semver
 producer: component identifier
 timestamp: ISO-8601
 correlation_id: UUID | null
-causal_id: UUID | null
+causation_id: UUID | null
 ordering_scope: aggregate_id
 idempotency_key: event_id
 ```

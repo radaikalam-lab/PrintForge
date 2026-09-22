@@ -1,4 +1,4 @@
-# ADR-007: Document Representation
+# ADR-018: Document Representation
 
 ## Status
 

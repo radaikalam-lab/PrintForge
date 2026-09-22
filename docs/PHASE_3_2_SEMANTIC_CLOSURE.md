@@ -98,8 +98,8 @@ Phase 3.2 closes semantic inconsistencies identified during architecture review 
 | docs/contracts/OBSERVATION_CONTRACT.md | Removed AGING references |
 | docs/contracts/OBSERVATION_EVIDENCE_CONTRACT.md | Removed AGING, added EXPIRED |
 | docs/contracts/API_CONTRACT.md | Changed PENDING to CREATED |
-| docs/adr/ADR-005-observation-reconciliation.md | Fixed example (duplex = unsupported) |
-| docs/adr/ADR-011-capability-reconciliation-dimensions.md | Fixed ACCEPTED_OBSERVED → ACCEPTED |
+| docs/adr/ADR-009-observation-reconciliation.md | Fixed example (duplex = unsupported) |
+| docs/adr/ADR-010-capability-reconciliation-dimensions.md | Fixed ACCEPTED_OBSERVED → ACCEPTED |
 
 ## Tests added
 

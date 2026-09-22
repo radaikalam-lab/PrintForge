@@ -1,4 +1,4 @@
-# ADR-004: Epistemic Status Model
+# ADR-008: Epistemic Status Model
 
 ## Status
 

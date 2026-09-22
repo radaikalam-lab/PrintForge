@@ -1,4 +1,4 @@
-# ADR-008: Spool Architecture
+# ADR-016: Spool Architecture
 
 ## Status
 

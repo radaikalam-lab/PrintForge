@@ -1,4 +1,4 @@
-# ADR-002: CUPS and PAPPL Integration
+# ADR-006: CUPS and PAPPL Integration
 
 ## Status
 
@@ -57,7 +57,10 @@ We will integrate with both CUPS and PAPPL, treating them as provider types:
 - CUPS and PAPPL are Linux-specific. We cannot deploy on Windows without additional providers.
 - CUPS configuration is complex and varies across distributions.
 - PAPPL is newer and less widely deployed than CUPS.
-- Both CUPS and PAPPL require root-like access to some system resources (ports, device files).
+
+### Deployment Boundary
+
+CUPS and PAPPL adapters run in a separate integration/runtime boundary from the PrintForge core. The core itself maintains the non-root container principle. CUPS/PAPPL providers may require elevated privileges or device access; the final deployment mechanism is deferred to a future operational ADR. The general non-root principle is not weakened for the core.
 
 ### Neutral
 

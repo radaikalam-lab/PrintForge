@@ -1,4 +1,4 @@
-# ADR-005: Observation Reconciliation
+# ADR-009: Observation Reconciliation
 
 ## Status
 
@@ -25,16 +25,14 @@ CONSISTENCY:
 
 Both declaration and observation are preserved with full provenance. Neither is silently overwritten.
 
-Reconciliation status values:
+The canonical reconciliation model uses independent dimensions defined in ADR-010:
 
-| Status | Meaning |
-|--------|---------|
-| DECLARED | Only declared capabilities available; no observation received |
-| OBSERVED | Observed capabilities match declared capabilities |
-| CONTRADICTED | Observed capabilities differ from declared capabilities |
-| UNAVAILABLE | Observation unavailable; declared capabilities remain the only source of truth |
+- **Source**: OBSERVED, DECLARED, DERIVED, ASSUMED
+- **Freshness**: FRESH, STALE, EXPIRED, UNKNOWN
+- **Consistency**: CONSISTENT, CONTRADICTED, UNKNOWN
+- **Reconciliation outcome**: ACCEPTED, ACCEPTED_WITH_STALE_EVIDENCE, CONFLICT, UNRESOLVED, UNAVAILABLE
 
-Stale observations participate in reconciliation and are marked CONTRADICTED when they conflict with declarations, but remain identifiable as stale.
+ADR-009 defers to ADR-010 for the canonical multidimensional reconciliation vocabulary and rules.
 
 ## Consequences
 
@@ -43,11 +41,12 @@ Stale observations participate in reconciliation and are marked CONTRADICTED whe
 - Contradictions are visible and auditable.
 - Operators can investigate discrepancies rather than being misled by silent overwrites.
 - The system never fabricates capabilities.
+- Reconciliation dimensions are independent and composable.
 
 ### Negative
 
 - Contradicted printers require operator intervention.
-- Routing must handle CONTRADICTED status explicitly.
+- Routing must handle CONFLICT status explicitly.
 
 ### Neutral
 
@@ -61,6 +60,7 @@ Stale observations participate in reconciliation and are marked CONTRADICTED whe
 
 ## References
 
+- ADR-010: Capability Reconciliation Dimensions
 - CAPABILITY_CONTRACT.md
 - OBSERVATION_EVIDENCE_CONTRACT.md
 - domain/capabilities.py

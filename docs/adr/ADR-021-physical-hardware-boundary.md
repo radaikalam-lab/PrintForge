@@ -1,4 +1,4 @@
-# ADR-006: Physical Hardware Boundary
+# ADR-021: Physical Hardware Boundary
 
 ## Status
 
@@ -17,20 +17,40 @@ We need a clear boundary between the software system and physical hardware to:
 
 We establish a strict physical hardware boundary:
 
-1. **No Direct Control**: PrintForge never sends electrical signals, opens hardware gates, or manipulates physical mechanisms.
-2. **Provider Mediation**: All hardware interaction is mediated by providers. Providers translate software commands to hardware-specific protocols.
-3. **Observable, Not Controllable**: The system observes hardware state via providers but does not directly control hardware.
-4. **Graceful Degradation**: Hardware failures are treated as provider failures. The system continues operating with remaining hardware.
-5. **Physical Assumptions Documented**: Any physical assumptions (e.g., "paper is loaded," "toner is present") are documented as provider-reported observations, not software facts.
+1. **Provider-Mediated Command**: The system commands hardware only through providers, under contract. It never manipulates hardware directly.
+2. **Provider-Mediated Observation**: The system observes hardware state via providers but never treats provider reports as authoritative physical truth.
+3. **Provider Role**: Providers are both command interfaces and observation interfaces. Providers may command printer operations under contract. Providers may observe printer state. Providers do not own physical truth. Providers do not mutate PrintForge domain state.
+4. **Printer Authority**: The physical printer remains authoritative for physical reality.
+5. **Graceful Degradation**: Hardware failures are treated as provider failures. The system continues operating with remaining hardware.
+6. **Physical Assumptions Documented**: Any physical assumptions (e.g., "paper is loaded," "toner is present") are documented as provider-reported observations, not software facts.
+
+### Distinction
+
+```text
+Provider
+    = command interface + observation interface
+
+Printer
+    = physical authority
+```
+
+Therefore:
+
+```text
+Provider may command
+Provider may observe
+Provider does not own physical truth
+Provider does not mutate PrintForge domain state
+```
 
 ### Boundary Rules
 
 | Software Action | Hardware Action |
 |-----------------|-----------------|
-| Send IPP Print-Job request | Provider translates to printer language |
-| Query printer status | Provider reads hardware sensors |
-| Cancel job | Provider sends cancel command to printer |
-| Observe metrics | Provider reads hardware telemetry |
+| Send print request via Provider | Provider translates to printer language |
+| Query printer status via Provider | Provider reads hardware sensors |
+| Cancel job via Provider | Provider sends cancel command to printer |
+| Observe metrics via Provider | Provider reads hardware telemetry |
 
 ### Hardware Failure Handling
 
@@ -51,6 +71,7 @@ We establish a strict physical hardware boundary:
 - Clear separation of concerns between software and hardware.
 - Hardware failures are isolated and do not crash the software.
 - The system is safe: it cannot cause physical damage because it never touches hardware directly.
+- Provider reports are correctly treated as observations, not authoritative physical truth.
 
 ### Negative
 

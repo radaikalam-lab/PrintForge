@@ -1,4 +1,4 @@
-# ADR-004: Deterministic Core
+# ADR-007: Deterministic Core
 
 ## Status
 
@@ -31,7 +31,7 @@ The core consists of:
 - `validate_job(job, capabilities) -> ValidationResult`
 - `match_capabilities(requirement, capabilities) -> MatchResult`
 - `route_job(job, printers) -> RouterDecision`
-- `transition_state(job, trigger) -> JobState`
+- `validate_job_transition(current_state, new_state) -> None` (raises `ValueError` on invalid transition)
 - `evaluate_policy(policy, context) -> PolicyResult`
 
 These functions:

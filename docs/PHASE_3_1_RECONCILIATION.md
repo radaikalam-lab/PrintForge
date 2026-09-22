@@ -87,9 +87,9 @@ Renamed from "Epistemic Novelty â‰  Production Authority" to "Epistemic Status â
 | File | Change |
 |------|--------|
 | docs/ARCHITECTURE.md | Updated to v0.3 |
-| docs/adr/ADR-009-execution-attempt-model.md | New |
-| docs/adr/ADR-010-unknown-semantics.md | New |
-| docs/adr/ADR-011-capability-reconciliation-dimensions.md | New |
+| docs/adr/ADR-013-execution-attempt-model.md | New |
+| docs/adr/ADR-014-unknown-semantics.md | New |
+| docs/adr/ADR-010-capability-reconciliation-dimensions.md | New |
 
 ## Phase 3 baseline
 

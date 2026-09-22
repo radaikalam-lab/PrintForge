@@ -1,4 +1,4 @@
-# ADR-009: Persistence Abstraction
+# ADR-017: Persistence Abstraction
 
 ## Status
 
@@ -20,7 +20,7 @@ We adopt a persistence abstraction layer with specialized stores:
 
 1. **Job Store**: Relational database (PostgreSQL) for structured job and printer metadata. Supports transactions, joins, and complex queries.
 2. **Event Store**: Append-only log (event store or Kafka) for domain events. Supports ordered consumption and replay.
-3. **Spool**: Pluggable backend for documents (see ADR-008).
+3. **Spool**: Pluggable backend for documents (see ADR-016).
 4. **Config Store**: Embedded key-value store (e.g., SQLite, BoltDB) for configuration. Low-latency, strongly consistent.
 5. **Cache**: In-memory cache (Redis or in-process) for hot data (printer status, job state).
 

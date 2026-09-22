@@ -30,7 +30,7 @@ Phase 3 API integration and epistemic boundary contracts have been implemented a
 - `tests/epistemic/test_epistemic_boundary.py`: Tests for epistemic status exposure, validation non-bypass, non-authority, contradiction isolation, stale observation semantics.
 - `tests/epistemic/test_capability_reconciliation.py`: Tests for all declared/observed reconciliation scenarios.
 - `docs/ARCHITECTURE.md`: Updated to v0.2 with ports-and-adapters diagram, epistemic overlay, authority model, single-writer rule, responsibility matrix, event semantics, trust boundaries, and invariants.
-- `docs/adr/`: Created ADR-001 through ADR-008 covering authority model, state ownership, provider isolation, epistemic status, observation reconciliation, provenance, event semantics, and policy engine boundary.
+- `docs/adr/`: Created ADR-001 through ADR-022 covering authority model, state ownership, provider architecture, provider isolation, IPP boundary, CUPS/PAPPL integration, deterministic core, epistemic status, observation reconciliation, capability reconciliation dimensions, provenance model, event delivery semantics, execution attempt model, UNKNOWN semantics, policy engine boundary, spool architecture, persistence abstraction, document representation, Docker/Linux deployment, simulation-first development, and physical hardware boundary.
 - `pyproject.toml`: Added ruff and mypy configuration.
 - `persistence/__init__.py`: Added missing package init.
 

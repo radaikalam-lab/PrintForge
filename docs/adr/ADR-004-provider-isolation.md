@@ -1,4 +1,4 @@
-# ADR-003: Provider Isolation
+# ADR-004: Provider Isolation
 
 ## Status
 

@@ -1,4 +1,4 @@
-# ADR-011: Capability Reconciliation Dimensions
+# ADR-010: Capability Reconciliation Dimensions
 
 ## Status
 
