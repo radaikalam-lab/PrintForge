@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  printforge:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Optional CUPS/PAPPL service stub
+  # cups:
+  #   image: ghcr.io/opensourceprint/cups-pdf:latest
+  #   ports:
+  #     - "631:631"
+  #   volumes:
+  #     - cups-data:/var/spool/cups
+  #   restart: unless-stopped
+
+# volumes:
+#   cups-data:

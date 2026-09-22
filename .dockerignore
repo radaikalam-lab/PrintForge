@@ -1,0 +1,52 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.eggs/
+*.egg-info/
+dist/
+build/
+.installed.cfg
+*.egg
+MANIFEST
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+
+# FastAPI / Uvicorn
+*.pid
+
+# Git
+.git
+.gitignore
+
+# GitHub
+.github/
+
+# Docs
+*.md
+docs/
+
+# Docker
+docker/
+Dockerfile
+dockerignore
