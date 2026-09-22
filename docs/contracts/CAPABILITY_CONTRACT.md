@@ -86,3 +86,15 @@ A `CapabilityRequirement` (from a PrintJob) matches a `PrinterCapabilities` if a
 - Capabilities are declarative assertions by the provider.
 - The system may verify capabilities at registration time but must trust them during routing unless contradicted by observation.
 - Contradiction between declared capabilities and observation must trigger a `CapabilityMismatch` event and mark the printer `DEGRADED`.
+
+## 10. Capability Reconciliation
+
+- Declared capabilities and observed capabilities must be reconciled explicitly.
+- Reconciliation outcome values: `ACCEPTED`, `ACCEPTED_WITH_STALE_EVIDENCE`, `CONFLICT`, `UNRESOLVED`, `UNAVAILABLE`.
+- `ACCEPTED` — observed capabilities match declared capabilities and evidence is fresh.
+- `ACCEPTED_WITH_STALE_EVIDENCE` — observed capabilities match declared capabilities but evidence is stale.
+- `CONFLICT` — observed capabilities differ from declared capabilities.
+- `UNRESOLVED` — evidence is insufficient or unavailable.
+- `UNAVAILABLE` — observation is unavailable; declared capabilities remain the only source of truth.
+- Reconciliation must preserve both declared and observed capability sets with full provenance.
+- Capability values are distinct from observation/query execution results. A failed capability query is represented as `UNAVAILABLE`, not as a capability value.

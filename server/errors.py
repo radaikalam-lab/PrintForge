@@ -1,9 +1,9 @@
+
 from fastapi import HTTPException
-from typing import Optional
 
 
 class PrintForgeError(Exception):
-    def __init__(self, code: str, message: str, status_code: int = 400, details: Optional[dict] = None):
+    def __init__(self, code: str, message: str, status_code: int = 400, details: dict | None = None):
         self.code = code
         self.message = message
         self.status_code = status_code
@@ -25,7 +25,7 @@ def map_to_http(error: PrintForgeError) -> HTTPException:
 # Deterministic error codes
 
 class InvalidRequestError(PrintForgeError):
-    def __init__(self, message: str, details: Optional[dict] = None):
+    def __init__(self, message: str, details: dict | None = None):
         super().__init__("INVALID_REQUEST", message, status_code=400, details=details)
 
 

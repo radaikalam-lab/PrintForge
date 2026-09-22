@@ -1,10 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Dict, Any, List
-from datetime import datetime, UTC
+
+from domain.events import DomainEvent
+from domain.execution import PrintExecution
 from domain.job import PrintJob
 from domain.printer import Printer
-from domain.execution import PrintExecution
-from domain.events import DomainEvent
 
 
 class PrintJobRepository(ABC):
@@ -13,11 +12,11 @@ class PrintJobRepository(ABC):
         pass
 
     @abstractmethod
-    async def get(self, job_id: str) -> Optional[PrintJob]:
+    async def get(self, job_id: str) -> PrintJob | None:
         pass
 
     @abstractmethod
-    async def list(self) -> List[PrintJob]:
+    async def list(self) -> list[PrintJob]:
         pass
 
     @abstractmethod
@@ -31,11 +30,11 @@ class PrinterRepository(ABC):
         pass
 
     @abstractmethod
-    async def get(self, printer_id: str) -> Optional[Printer]:
+    async def get(self, printer_id: str) -> Printer | None:
         pass
 
     @abstractmethod
-    async def list(self) -> List[Printer]:
+    async def list(self) -> list[Printer]:
         pass
 
     @abstractmethod
@@ -49,11 +48,11 @@ class ExecutionRepository(ABC):
         pass
 
     @abstractmethod
-    async def get(self, execution_id: str) -> Optional[PrintExecution]:
+    async def get(self, execution_id: str) -> PrintExecution | None:
         pass
 
     @abstractmethod
-    async def list_by_job(self, job_id: str) -> List[PrintExecution]:
+    async def list_by_job(self, job_id: str) -> list[PrintExecution]:
         pass
 
 
@@ -63,5 +62,5 @@ class EventRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_events_for_job(self, job_id: str) -> List[DomainEvent]:
+    async def get_events_for_job(self, job_id: str) -> list[DomainEvent]:
         pass

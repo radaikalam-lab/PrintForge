@@ -1,8 +1,7 @@
-import pytest
-from simulation.simulator import DeterministicPrinterSimulator
-from domain.job import PrintJob, PrintJobState
-from domain.printer import Printer, PrinterState
 from domain.capabilities import PrinterCapabilities
+from domain.job import PrintJobState
+from domain.printer import Printer, PrinterState
+from simulation.simulator import DeterministicPrinterSimulator
 
 
 def test_simulator_deterministic_replay():

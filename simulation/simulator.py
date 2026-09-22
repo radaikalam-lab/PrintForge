@@ -1,24 +1,24 @@
 import random
-from typing import Optional, Dict, Any, List
-from datetime import datetime, UTC
-from domain.job import PrintJob, PrintJobState
-from domain.printer import Printer, PrinterState
+from datetime import UTC, datetime
+
 from domain.capabilities import PrinterCapabilities
+from domain.execution import ExecutionState, PrintExecution
+from domain.job import PrintJob, PrintJobState
 from domain.observation import PrinterObservation
-from domain.execution import PrintExecution, ExecutionState
-from domain.state_machines import validate_job_transition, validate_printer_transition
+from domain.printer import Printer, PrinterState
+from domain.state_machines import validate_job_transition
 
 
 class DeterministicPrinterSimulator:
-    def __init__(self, seed: Optional[int] = None):
+    def __init__(self, seed: int | None = None):
         self._rng = random.Random(seed)
-        self._printers: Dict[str, Printer] = {}
-        self._jobs: Dict[str, PrintJob] = {}
-        self._observations: Dict[str, PrinterObservation] = {}
-        self._executions: Dict[str, PrintExecution] = {}
+        self._printers: dict[str, Printer] = {}
+        self._jobs: dict[str, PrintJob] = {}
+        self._observations: dict[str, PrinterObservation] = {}
+        self._executions: dict[str, PrintExecution] = {}
         self._latency_ms: int = 0
         self._failure_injection: bool = False
-        self._paper_empty: Dict[str, bool] = {}
+        self._paper_empty: dict[str, bool] = {}
 
     def set_latency(self, latency_ms: int) -> None:
         self._latency_ms = latency_ms
@@ -35,13 +35,13 @@ class DeterministicPrinterSimulator:
     def _now(self) -> datetime:
         return datetime.now(UTC)
 
-    async def discover(self) -> List[Printer]:
+    async def discover(self) -> list[Printer]:
         if self._latency_ms:
             import asyncio
             await asyncio.sleep(self._latency_ms / 1000.0)
         return list(self._printers.values())
 
-    async def get_identities(self) -> List[str]:
+    async def get_identities(self) -> list[str]:
         return list(self._printers.keys())
 
     async def get_capabilities(self, printer_id: str) -> PrinterCapabilities:
@@ -90,7 +90,7 @@ class DeterministicPrinterSimulator:
             requested_operation="submit",
             accepted=True,
             timestamps={"submitted": self._now()},
-            execution_state=ExecutionState.ACCEPTED,
+            execution_state=ExecutionState.SUBMITTED,
             provenance={"simulator": True},
         )
         self._executions[execution_id] = execution
@@ -141,8 +141,8 @@ class DeterministicPrinterSimulator:
                     printer.state = PrinterState.ERROR
         return job
 
-    def get_job(self, job_id: str) -> Optional[PrintJob]:
+    def get_job(self, job_id: str) -> PrintJob | None:
         return self._jobs.get(job_id)
 
-    def get_execution(self, execution_id: str) -> Optional[PrintExecution]:
+    def get_execution(self, execution_id: str) -> PrintExecution | None:
         return self._executions.get(execution_id)

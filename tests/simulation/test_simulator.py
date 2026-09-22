@@ -1,10 +1,11 @@
-import pytest
 import asyncio
-from simulation.simulator import DeterministicPrinterSimulator
+
+import pytest
+
+from domain.capabilities import PrinterCapabilities
 from domain.job import PrintJob, PrintJobState
 from domain.printer import Printer, PrinterState
-from domain.capabilities import PrinterCapabilities
-from domain.state_machines import validate_job_transition
+from simulation.simulator import DeterministicPrinterSimulator
 
 
 @pytest.fixture

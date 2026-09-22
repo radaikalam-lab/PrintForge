@@ -1,19 +1,19 @@
 from fastapi.testclient import TestClient
-from server.api import app
-from domain.job import PrintJob, PrintJobState
-from domain.printer import Printer, PrinterState
+
+from application.services import PrinterService, PrintJobService
 from domain.capabilities import PrinterCapabilities
-from domain.observation import PrinterObservation, EpistemicStatus
+from domain.observation import EpistemicStatus, PrinterObservation
+from domain.printer import Printer, PrinterState
 from persistence.memory import (
-    InMemoryPrintJobRepository,
-    InMemoryPrinterRepository,
-    InMemoryExecutionRepository,
     InMemoryEventRepository,
+    InMemoryExecutionRepository,
+    InMemoryPrinterRepository,
+    InMemoryPrintJobRepository,
 )
-from application.services import PrintJobService, PrinterService
+from server.api import app
 from tests.helpers.fake_providers import (
-    FakeDiscoveryProvider,
     FakeCapabilityProvider,
+    FakeDiscoveryProvider,
     FakeObservationProvider,
     FakeSubmissionProvider,
 )
@@ -73,8 +73,8 @@ def _build_job_service():
 
 def _override_dependencies():
     from server.api import (
-        get_printer_service,
         get_print_job_service,
+        get_printer_service,
     )
     app.dependency_overrides[get_printer_service] = _build_printer_service
     app.dependency_overrides[get_print_job_service] = _build_job_service

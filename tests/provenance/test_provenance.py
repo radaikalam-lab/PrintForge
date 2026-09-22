@@ -1,10 +1,8 @@
-import pytest
-from domain.job import PrintJob
-from domain.events import PrintJobCreated, PrintJobValidated
-from domain.execution import PrintExecution
-from simulation.simulator import DeterministicPrinterSimulator
 from domain.capabilities import PrinterCapabilities
+from domain.execution import PrintExecution
+from domain.job import PrintJob
 from domain.printer import Printer, PrinterState
+from simulation.simulator import DeterministicPrinterSimulator
 
 
 def test_job_provenance_retained():

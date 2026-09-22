@@ -1,16 +1,17 @@
-from pydantic import BaseModel, Field
-from datetime import datetime, UTC
-from typing import Optional, Dict, Any, List
+from datetime import datetime
 from enum import Enum
+from typing import Any
+
+from pydantic import BaseModel, Field
 
 
 class ExecutionState(str, Enum):
-    PENDING = "PENDING"
-    ACCEPTED = "ACCEPTED"
-    REJECTED = "REJECTED"
+    SUBMITTED = "SUBMITTED"
     PROCESSING = "PROCESSING"
     COMPLETED = "COMPLETED"
     FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
+    REJECTED = "REJECTED"
     UNKNOWN = "UNKNOWN"
 
 
@@ -18,11 +19,11 @@ class PrintExecution(BaseModel):
     execution_id: str
     job_id: str
     printer_id: str
-    provider: Optional[str] = None
+    provider: str | None = None
     requested_operation: str
     accepted: bool = False
-    timestamps: Dict[str, datetime] = Field(default_factory=dict)
-    provider_response: Optional[Dict[str, Any]] = None
-    execution_state: ExecutionState = ExecutionState.PENDING
-    failure_information: Optional[Dict[str, Any]] = None
-    provenance: Dict[str, Any] = Field(default_factory=dict)
+    timestamps: dict[str, datetime] = Field(default_factory=dict)
+    provider_response: dict[str, Any] | None = None
+    execution_state: ExecutionState = ExecutionState.SUBMITTED
+    failure_information: dict[str, Any] | None = None
+    provenance: dict[str, Any] = Field(default_factory=dict)

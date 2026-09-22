@@ -1,20 +1,26 @@
-from datetime import datetime, UTC, timedelta
 import asyncio
-from application.services import PrintJobService, PrinterService
-from domain.job import PrintJob, PrintJobState
-from domain.printer import Printer, PrinterState
+from datetime import UTC, datetime, timedelta
+
+from application.services import PrinterService, PrintJobService
 from domain.capabilities import PrinterCapabilities
-from domain.observation import PrinterObservation, EpistemicStatus
-from domain.state_machines import validate_job_transition
+from domain.job import PrintJob, PrintJobState
+from domain.observation import (
+    EpistemicStatus,
+    FreshnessPolicy,
+    PrinterObservation,
+    observation_age_seconds,
+    qualify_observation,
+)
+from domain.printer import Printer, PrinterState
 from persistence.memory import (
-    InMemoryPrintJobRepository,
-    InMemoryPrinterRepository,
-    InMemoryExecutionRepository,
     InMemoryEventRepository,
+    InMemoryExecutionRepository,
+    InMemoryPrinterRepository,
+    InMemoryPrintJobRepository,
 )
 from tests.helpers.fake_providers import (
-    FakeDiscoveryProvider,
     FakeCapabilityProvider,
+    FakeDiscoveryProvider,
     FakeObservationProvider,
     FakeSubmissionProvider,
 )
@@ -25,8 +31,6 @@ def asyncio_await(coro):
 
 
 def test_observation_epistemic_status_is_exposed():
-    job_repo = InMemoryPrintJobRepository()
-    exec_repo = InMemoryExecutionRepository()
     event_repo = InMemoryEventRepository()
     printer_repo = InMemoryPrinterRepository()
 
@@ -99,8 +103,6 @@ def test_assumed_observation_does_not_bypass_validation():
 
 
 def test_epistemic_non_authority_prevents_direct_capability_fabrication():
-    job_repo = InMemoryPrintJobRepository()
-    exec_repo = InMemoryExecutionRepository()
     event_repo = InMemoryEventRepository()
     printer_repo = InMemoryPrinterRepository()
 
@@ -140,8 +142,6 @@ def test_epistemic_non_authority_prevents_direct_capability_fabrication():
 
 
 def test_contradicted_observation_does_not_corrupt_domain_state():
-    job_repo = InMemoryPrintJobRepository()
-    exec_repo = InMemoryExecutionRepository()
     event_repo = InMemoryEventRepository()
     printer_repo = InMemoryPrinterRepository()
 
@@ -180,3 +180,90 @@ def test_contradicted_observation_does_not_corrupt_domain_state():
 
     retrieved = asyncio_await(printer_repo.get("printer-1"))
     assert retrieved.state == PrinterState.IDLE
+
+
+def test_observation_timestamp_is_preserved():
+    now = datetime.now(UTC)
+    obs = PrinterObservation(
+        printer_identity="urn:printer:1",
+        printer_state=PrinterState.IDLE.value,
+        timestamp=now,
+    )
+    assert obs.timestamp == now
+    assert obs.retrieval_timestamp is None
+
+
+def test_observation_age_is_deterministically_calculable():
+    now = datetime.now(UTC)
+    obs = PrinterObservation(
+        printer_identity="urn:printer:1",
+        printer_state=PrinterState.IDLE.value,
+        retrieval_timestamp=now - timedelta(seconds=42),
+    )
+    age = observation_age_seconds(obs, now)
+    assert abs(age - 42.0) < 0.1
+
+
+def test_staleness_does_not_mutate_original_observation():
+    now = datetime.now(UTC)
+    obs = PrinterObservation(
+        printer_identity="urn:printer:1",
+        printer_state=PrinterState.IDLE.value,
+        epistemic_status=EpistemicStatus.OBSERVED,
+        retrieval_timestamp=now - timedelta(seconds=120),
+    )
+    policy = FreshnessPolicy(stale_max_age_seconds=60)
+    qualified = qualify_observation(obs, policy, now)
+    assert obs.epistemic_status == EpistemicStatus.OBSERVED
+    assert qualified.epistemic_status == EpistemicStatus.STALE
+
+
+def test_stale_information_cannot_become_current():
+    now = datetime.now(UTC)
+    obs = PrinterObservation(
+        printer_identity="urn:printer:1",
+        printer_state=PrinterState.IDLE.value,
+        epistemic_status=EpistemicStatus.STALE,
+        retrieval_timestamp=now - timedelta(seconds=120),
+    )
+    policy = FreshnessPolicy(fresh_max_age_seconds=60)
+    qualified = qualify_observation(obs, policy, now)
+    assert qualified.epistemic_status == EpistemicStatus.STALE
+
+
+def test_unavailable_observation_remains_unknown():
+    now = datetime.now(UTC)
+    obs = PrinterObservation(
+        printer_identity="urn:printer:1",
+        printer_state=PrinterState.UNKNOWN.value,
+        epistemic_status=EpistemicStatus.UNKNOWN,
+    )
+    policy = FreshnessPolicy(stale_max_age_seconds=1)
+    qualified = qualify_observation(obs, policy, now)
+    assert qualified.epistemic_status == EpistemicStatus.UNKNOWN
+
+
+def test_provider_specific_freshness_policy():
+    now = datetime.now(UTC)
+    obs = PrinterObservation(
+        printer_identity="urn:printer:1",
+        printer_state=PrinterState.IDLE.value,
+        provider="provider-a",
+        retrieval_timestamp=now - timedelta(seconds=120),
+    )
+    policy = FreshnessPolicy(provider_id="provider-a", stale_max_age_seconds=60)
+    qualified = qualify_observation(obs, policy, now)
+    assert qualified.epistemic_status == EpistemicStatus.STALE
+
+
+def test_accidental_freshness_promotion_is_negative():
+    now = datetime.now(UTC)
+    obs = PrinterObservation(
+        printer_identity="urn:printer:1",
+        printer_state=PrinterState.IDLE.value,
+        epistemic_status=EpistemicStatus.STALE,
+        retrieval_timestamp=now - timedelta(seconds=120),
+    )
+    policy = FreshnessPolicy(fresh_max_age_seconds=60)
+    qualified = qualify_observation(obs, policy, now)
+    assert qualified.epistemic_status == EpistemicStatus.STALE

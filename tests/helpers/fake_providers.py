@@ -1,26 +1,26 @@
-from typing import List, Optional
-from domain.printer import Printer, PrinterState
+
 from domain.capabilities import PrinterCapabilities
-from domain.observation import PrinterObservation, EpistemicStatus
+from domain.execution import ExecutionState, PrintExecution
 from domain.job import PrintJob
-from domain.execution import PrintExecution, ExecutionState
+from domain.observation import PrinterObservation
+from domain.printer import Printer
 from providers.interfaces import (
-    PrinterDiscoveryProvider,
+    PrintCancellationProvider,
     PrinterCapabilityProvider,
+    PrinterDiscoveryProvider,
     PrinterObservationProvider,
     PrintSubmissionProvider,
-    PrintCancellationProvider,
 )
 
 
 class FakeDiscoveryProvider(PrinterDiscoveryProvider):
-    def __init__(self, printers: List[Printer]):
+    def __init__(self, printers: list[Printer]):
         self._printers = printers
 
-    async def discover(self) -> List[Printer]:
+    async def discover(self) -> list[Printer]:
         return list(self._printers)
 
-    async def get_identities(self) -> List[str]:
+    async def get_identities(self) -> list[str]:
         return [p.printer_id for p in self._printers]
 
 
@@ -42,7 +42,7 @@ class FakeObservationProvider(PrinterObservationProvider):
 
 class FakeSubmissionProvider(PrintSubmissionProvider):
     def __init__(self):
-        self.submitted: List[PrintExecution] = []
+        self.submitted: list[PrintExecution] = []
 
     async def submit(self, job: PrintJob) -> PrintExecution:
         execution = PrintExecution(
@@ -52,7 +52,7 @@ class FakeSubmissionProvider(PrintSubmissionProvider):
             provider="fake",
             requested_operation="submit",
             accepted=True,
-            execution_state=ExecutionState.ACCEPTED,
+            execution_state=ExecutionState.SUBMITTED,
             provenance={"fake": True},
         )
         self.submitted.append(execution)
@@ -61,7 +61,7 @@ class FakeSubmissionProvider(PrintSubmissionProvider):
 
 class FakeCancellationProvider(PrintCancellationProvider):
     def __init__(self):
-        self.cancelled: List[str] = []
+        self.cancelled: list[str] = []
 
     async def cancel(self, job_id: str) -> bool:
         self.cancelled.append(job_id)

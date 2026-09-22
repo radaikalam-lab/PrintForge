@@ -1,8 +1,8 @@
-import pytest
+from datetime import datetime
+
+from domain.capabilities import PrinterCapabilities
 from domain.job import PrintJob, PrintJobState
 from domain.printer import Printer, PrinterState
-from domain.capabilities import PrinterCapabilities
-from datetime import datetime, UTC
 
 
 def test_print_job_creation():

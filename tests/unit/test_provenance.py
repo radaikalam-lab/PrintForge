@@ -1,6 +1,5 @@
-import pytest
-from domain.job import PrintJob
 from domain.events import PrintJobCreated
+from domain.job import PrintJob
 
 
 def test_provenance_preserved_on_job_creation():

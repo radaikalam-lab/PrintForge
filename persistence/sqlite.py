@@ -1,15 +1,19 @@
-import sqlite3
 import json
-import asyncio
-from typing import Optional, Dict, Any, List
-from datetime import datetime, UTC
-from persistence.interfaces import PrintJobRepository, PrinterRepository, ExecutionRepository
+import sqlite3
+from datetime import UTC, datetime
+from typing import Any
+
+from domain.execution import ExecutionState, PrintExecution
 from domain.job import PrintJob, PrintJobState
 from domain.printer import Printer, PrinterState
-from domain.execution import PrintExecution, ExecutionState
+from persistence.interfaces import (
+    ExecutionRepository,
+    PrinterRepository,
+    PrintJobRepository,
+)
 
 
-def _row_to_print_job(row: Dict[str, Any]) -> PrintJob:
+def _row_to_print_job(row: dict[str, Any]) -> PrintJob:
     return PrintJob(
         job_id=row["job_id"],
         source_document=row["source_document"],
@@ -34,7 +38,7 @@ def _row_to_print_job(row: Dict[str, Any]) -> PrintJob:
     )
 
 
-def _row_to_printer(row: Dict[str, Any]) -> Printer:
+def _row_to_printer(row: dict[str, Any]) -> Printer:
     from domain.capabilities import PrinterCapabilities
     caps_data = json.loads(row["capabilities"]) if row.get("capabilities") else {}
     capabilities = PrinterCapabilities(**caps_data)
@@ -131,7 +135,7 @@ class SQLitePrintJobRepository(PrintJobRepository):
         finally:
             conn.close()
 
-    async def get(self, job_id: str) -> Optional[PrintJob]:
+    async def get(self, job_id: str) -> PrintJob | None:
         conn = self._get_connection()
         try:
             row = conn.execute("SELECT * FROM print_jobs WHERE job_id = ?", (job_id,)).fetchone()
@@ -141,7 +145,7 @@ class SQLitePrintJobRepository(PrintJobRepository):
         finally:
             conn.close()
 
-    async def list(self) -> List[PrintJob]:
+    async def list(self) -> list[PrintJob]:
         conn = self._get_connection()
         try:
             rows = conn.execute("SELECT * FROM print_jobs").fetchall()
@@ -216,7 +220,7 @@ class SQLitePrinterRepository(PrinterRepository):
         finally:
             conn.close()
 
-    async def get(self, printer_id: str) -> Optional[Printer]:
+    async def get(self, printer_id: str) -> Printer | None:
         conn = self._get_connection()
         try:
             row = conn.execute("SELECT * FROM printers WHERE printer_id = ?", (printer_id,)).fetchone()
@@ -226,7 +230,7 @@ class SQLitePrinterRepository(PrinterRepository):
         finally:
             conn.close()
 
-    async def list(self) -> List[Printer]:
+    async def list(self) -> list[Printer]:
         conn = self._get_connection()
         try:
             rows = conn.execute("SELECT * FROM printers").fetchall()
@@ -304,7 +308,7 @@ class SQLiteExecutionRepository(ExecutionRepository):
         finally:
             conn.close()
 
-    async def get(self, execution_id: str) -> Optional[PrintExecution]:
+    async def get(self, execution_id: str) -> PrintExecution | None:
         conn = self._get_connection()
         try:
             row = conn.execute("SELECT * FROM executions WHERE execution_id = ?", (execution_id,)).fetchone()
@@ -314,7 +318,7 @@ class SQLiteExecutionRepository(ExecutionRepository):
         finally:
             conn.close()
 
-    async def list_by_job(self, job_id: str) -> List[PrintExecution]:
+    async def list_by_job(self, job_id: str) -> list[PrintExecution]:
         conn = self._get_connection()
         try:
             rows = conn.execute("SELECT * FROM executions WHERE job_id = ?", (job_id,)).fetchall()
@@ -322,7 +326,7 @@ class SQLiteExecutionRepository(ExecutionRepository):
         finally:
             conn.close()
 
-    def _row_to_execution(self, row: Dict[str, Any]) -> PrintExecution:
+    def _row_to_execution(self, row: dict[str, Any]) -> PrintExecution:
         timestamps = {}
         if row.get("timestamps"):
             raw = json.loads(row["timestamps"])

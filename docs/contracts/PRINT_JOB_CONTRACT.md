@@ -38,65 +38,106 @@ PrintJob:
 Valid states and transitions:
 
 ```
-PENDING -> VALIDATING
-PENDING -> REJECTED (validation failure)
+CREATED -> VALIDATED
+CREATED -> VALIDATION_FAILED (validation failure)
+CREATED -> CANCELLED (user request)
 
-VALIDATING -> QUEUED
-VALIDATING -> REJECTED (validation failure)
+VALIDATED -> QUEUED
+VALIDATED -> CANCELLED (user request)
 
-QUEUED -> EXECUTING
-QUEUED -> CANCELLING (user request)
-QUEUED -> EXPIRED (timeout)
+QUEUED -> SCHEDULED
+QUEUED -> BLOCKED (no eligible printer)
+QUEUED -> CANCELLED (user request)
 
-EXECUTING -> COMPLETED
-EXECUTING -> FAILED
-EXECUTING -> CANCELLING (user request)
+BLOCKED -> QUEUED (capability becomes available)
+BLOCKED -> CANCELLED (user request)
 
-CANCELLING -> CANCELLED
-CANCELLING -> EXECUTING (resume)
+SCHEDULED -> SUBMITTED
+SCHEDULED -> QUEUED (provider unreachable / reschedule)
+SCHEDULED -> CANCELLED (user request)
 
-FAILED -> RETRYING (if retries remaining)
-RETRYING -> EXECUTING
-RETRYING -> FAILED (exhausted)
+SUBMITTED -> PROCESSING
+SUBMITTED -> CANCELLED (user request)
 
-Any terminal state (COMPLETED, CANCELLED, FAILED, REJECTED, EXPIRED) -> ARCHIVED
+PROCESSING -> COMPLETED (all attempts succeed)
+PROCESSING -> FAILED (retries exhausted or non-retryable failure)
+PROCESSING -> CANCELLED (user request)
+PROCESSING -> BLOCKED (provider unreachable; retry authorized)
+
+Any terminal state (COMPLETED, VALIDATION_FAILED, CANCELLED, FAILED) -> ARCHIVED
 ```
 
 ### Transition Rules
 
 1. A job may only transition forward along defined edges.
 2. Transitions to terminal states are irreversible.
-3. Retry transitions reset the execution count but preserve provenance.
+3. Retries create new ExecutionAttempt entities; they do not roll back PrintJob state.
 4. Cancellation is best-effort. If execution has begun, cancellation may be delayed.
-5. Expiration is time-based. A queued job exceeding its `max_queue_time` transitions to EXPIRED.
+5. Provider rejection is represented as an ExecutionAttempt state, not a PrintJob state.
 
 ## 3. Legal Transitions Summary
 
 | From | To | Trigger |
 |------|----|---------|
-| PENDING | VALIDATING | System accepts job |
-| PENDING | REJECTED | Validation error on accept |
-| VALIDATING | QUEUED | Capability match succeeds |
-| VALIDATING | REJECTED | Capability match fails |
-| QUEUED | EXECUTING | Provider accepts job |
-| QUEUED | CANCELLING | User cancellation |
-| QUEUED | EXPIRED | Timeout exceeded |
-| EXECUTING | COMPLETED | Provider reports success |
-| EXECUTING | FAILED | Provider reports failure |
-| EXECUTING | CANCELLING | User cancellation during execution |
-| CANCELLING | CANCELLED | Provider confirms cancellation |
-| CANCELLING | EXECUTING | Provider reports progress despite cancel |
-| FAILED | RETRYING | Retry policy permits |
-| RETRYING | EXECUTING | Retry attempt starts |
-| RETRYING | FAILED | Retry policy exhausted |
+| CREATED | VALIDATED | System accepts job |
+| CREATED | VALIDATION_FAILED | Validation error on accept |
+| CREATED | CANCELLED | User cancels before validation |
+| VALIDATED | QUEUED | Capability match succeeds |
+| VALIDATED | CANCELLED | User cancels after validation |
+| QUEUED | SCHEDULED | Scheduler assigns printer |
+| QUEUED | BLOCKED | No eligible printer or capability |
+| QUEUED | CANCELLED | User cancels while queued |
+| BLOCKED | QUEUED | Capability becomes available or rescheduled |
+| BLOCKED | CANCELLED | User cancels while blocked |
+| SCHEDULED | SUBMITTED | Provider accepts job |
+| SCHEDULED | QUEUED | Provider unreachable before submission / reschedule |
+| SCHEDULED | CANCELLED | User cancels before submission |
+| SUBMITTED | PROCESSING | Provider begins execution |
+| SUBMITTED | CANCELLED | User cancels after submission |
+| PROCESSING | COMPLETED | All attempts succeed |
+| PROCESSING | FAILED | Retries exhausted or failure is non-retryable |
+| PROCESSING | CANCELLED | User cancels during execution |
+| PROCESSING | BLOCKED | Provider unreachable; retry authorized |
 | Any terminal | ARCHIVED | Retention policy triggers |
 
-## 4. Idempotency
+## 4. ExecutionAttempt Model
+
+Retries are represented by separate ExecutionAttempt entities, not PrintJob lifecycle transitions.
+
+```text
+PrintJob
+   │
+   ├── ExecutionAttempt 1
+   │       └── result
+   │
+   ├── ExecutionAttempt 2
+   │       └── result
+   │
+   └── ExecutionAttempt N
+           └── result
+```
+
+Every attempt records:
+- attempt_id
+- job_id
+- provider
+- printer_id
+- start_time
+- end_time
+- requested_operation
+- result
+- failure_information
+- provenance
+- correlation_id
+
+A retry creates a new ExecutionAttempt. The parent PrintJob remains non-terminal while retryable execution attempts exist. Previous attempt history is preserved.
+
+## 5. Idempotency
 
 - Job creation is idempotent with respect to `job_id`. Duplicate submission with same `job_id` returns the existing job.
-- Retry attempts must use the same `execution.execution_id` to preserve idempotency with the provider.
+- Retry attempts must use a new `execution_id` to preserve per-attempt provenance.
 
-## 5. Observability
+## 6. Observability
 
 Every state transition emits a `JobStateChanged` event (see EVENT_CONTRACT.md). The event must include:
 - `job_id`

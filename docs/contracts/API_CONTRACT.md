@@ -54,7 +54,7 @@ Response: `201 Created`
 ```json
 {
   "job_id": "string",
-  "state": "PENDING",
+  "state": "CREATED",
   "created_at": "timestamp",
   "links": { "self": "/api/v1/jobs/{job_id}" }
 }

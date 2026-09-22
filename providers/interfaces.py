@@ -1,38 +1,39 @@
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any
-from domain.printer import Printer
+from typing import Any
+
 from domain.capabilities import PrinterCapabilities
-from domain.observation import PrinterObservation
 from domain.execution import PrintExecution
 from domain.job import PrintJob
+from domain.observation import PrinterObservation
+from domain.printer import Printer
 
 
 class PrinterDiscoveryProvider(ABC):
-    capability_declaration: Dict[str, Any]
-    supported_operations: List[str]
+    capability_declaration: dict[str, Any]
+    supported_operations: list[str]
     version: str
     deterministic_identity: str
-    provenance: Dict[str, Any]
+    provenance: dict[str, Any]
     failure_semantics: str
     timeout_behavior: str
     retry_semantics: str
     idempotency_semantics: str
 
     @abstractmethod
-    async def discover(self) -> List[Printer]:
+    async def discover(self) -> list[Printer]:
         pass
 
     @abstractmethod
-    async def get_identities(self) -> List[str]:
+    async def get_identities(self) -> list[str]:
         pass
 
 
 class PrinterCapabilityProvider(ABC):
-    capability_declaration: Dict[str, Any]
-    supported_operations: List[str]
+    capability_declaration: dict[str, Any]
+    supported_operations: list[str]
     version: str
     deterministic_identity: str
-    provenance: Dict[str, Any]
+    provenance: dict[str, Any]
 
     @abstractmethod
     async def get_capabilities(self, printer_id: str) -> PrinterCapabilities:
@@ -40,11 +41,11 @@ class PrinterCapabilityProvider(ABC):
 
 
 class PrinterObservationProvider(ABC):
-    capability_declaration: Dict[str, Any]
-    supported_operations: List[str]
+    capability_declaration: dict[str, Any]
+    supported_operations: list[str]
     version: str
     deterministic_identity: str
-    provenance: Dict[str, Any]
+    provenance: dict[str, Any]
 
     @abstractmethod
     async def observe(self, printer_id: str) -> PrinterObservation:
@@ -52,11 +53,11 @@ class PrinterObservationProvider(ABC):
 
 
 class PrintSubmissionProvider(ABC):
-    capability_declaration: Dict[str, Any]
-    supported_operations: List[str]
+    capability_declaration: dict[str, Any]
+    supported_operations: list[str]
     version: str
     deterministic_identity: str
-    provenance: Dict[str, Any]
+    provenance: dict[str, Any]
 
     @abstractmethod
     async def submit(self, job: PrintJob) -> PrintExecution:
@@ -64,11 +65,11 @@ class PrintSubmissionProvider(ABC):
 
 
 class PrintCancellationProvider(ABC):
-    capability_declaration: Dict[str, Any]
-    supported_operations: List[str]
+    capability_declaration: dict[str, Any]
+    supported_operations: list[str]
     version: str
     deterministic_identity: str
-    provenance: Dict[str, Any]
+    provenance: dict[str, Any]
 
     @abstractmethod
     async def cancel(self, job_id: str) -> bool:
@@ -76,11 +77,11 @@ class PrintCancellationProvider(ABC):
 
 
 class PrinterControlProvider(ABC):
-    capability_declaration: Dict[str, Any]
-    supported_operations: List[str]
+    capability_declaration: dict[str, Any]
+    supported_operations: list[str]
     version: str
     deterministic_identity: str
-    provenance: Dict[str, Any]
+    provenance: dict[str, Any]
 
     @abstractmethod
     async def control(self, printer_id: str, operation: str) -> PrintExecution:
@@ -88,14 +89,14 @@ class PrinterControlProvider(ABC):
 
 
 class SpoolProvider(ABC):
-    capability_declaration: Dict[str, Any]
-    supported_operations: List[str]
+    capability_declaration: dict[str, Any]
+    supported_operations: list[str]
     version: str
     deterministic_identity: str
-    provenance: Dict[str, Any]
+    provenance: dict[str, Any]
 
     @abstractmethod
-    async def store(self, artifact: bytes, metadata: Dict[str, Any]) -> str:
+    async def store(self, artifact: bytes, metadata: dict[str, Any]) -> str:
         pass
 
     @abstractmethod
@@ -108,11 +109,11 @@ class SpoolProvider(ABC):
 
 
 class DocumentTransformProvider(ABC):
-    capability_declaration: Dict[str, Any]
-    supported_operations: List[str]
+    capability_declaration: dict[str, Any]
+    supported_operations: list[str]
     version: str
     deterministic_identity: str
-    provenance: Dict[str, Any]
+    provenance: dict[str, Any]
 
     @abstractmethod
     async def transform(self, document: bytes, source_format: str, target_format: str) -> bytes:
@@ -120,18 +121,18 @@ class DocumentTransformProvider(ABC):
 
 
 class PrintServerProvider(ABC):
-    capability_declaration: Dict[str, Any]
-    supported_operations: List[str]
+    capability_declaration: dict[str, Any]
+    supported_operations: list[str]
     version: str
     deterministic_identity: str
-    provenance: Dict[str, Any]
+    provenance: dict[str, Any]
 
     @abstractmethod
-    async def status(self) -> Dict[str, Any]:
+    async def status(self) -> dict[str, Any]:
         pass
 
     @abstractmethod
-    async def submit_job(self, job_spec: Dict[str, Any]) -> str:
+    async def submit_job(self, job_spec: dict[str, Any]) -> str:
         pass
 
     @abstractmethod

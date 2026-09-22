@@ -1,7 +1,8 @@
-from pydantic import BaseModel, Field
-from datetime import datetime, UTC
-from typing import Optional, Dict, Any, List
 from enum import Enum
+from typing import Any
+
+from pydantic import BaseModel, Field
+
 from domain.capabilities import PrinterCapabilities
 
 
@@ -20,7 +21,7 @@ class Printer(BaseModel):
     protocol: str
     capabilities: PrinterCapabilities
     state: PrinterState = PrinterState.UNKNOWN
-    location: Optional[str] = None
-    provider: Optional[str] = None
-    last_observation: Optional[Dict[str, Any]] = None
-    provenance: Dict[str, Any] = Field(default_factory=dict)
+    location: str | None = None
+    provider: str | None = None
+    last_observation: dict[str, Any] | None = None
+    provenance: dict[str, Any] = Field(default_factory=dict)

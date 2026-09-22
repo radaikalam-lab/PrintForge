@@ -60,6 +60,8 @@ Alert:
 - The system must never send commands to printers via observations.
 - Observations may be stale, delayed, or incomplete.
 - The system must treat observations as untrusted input that requires validation.
+- Each observation carries an `epistemic_status` field indicating its reliability (see OBSERVATION_EVIDENCE_CONTRACT.md).
+- A `FreshnessPolicy` defines provider-specific thresholds for `FRESH`, `STALE`, and `EXPIRED` observations.
 
 ### Authority
 
@@ -67,6 +69,7 @@ Alert:
 - Observations may trigger state transitions only through defined reconciliation rules.
 - If an observation contradicts authoritative state, the system must emit a `StateReconciliation` event and log the discrepancy.
 - The system must never accept an observation that bypasses validation or security checks.
+- Stale observations must not be treated as current physical truth.
 
 ## 5. Observation Semantics
 

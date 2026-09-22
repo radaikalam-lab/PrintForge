@@ -35,19 +35,23 @@ Every PrinterObservation must retain:
 * `DECLARED` — declared by provider without verification.
 * `OBSERVED` — directly observed by provider.
 * `DERIVED` — derived from other observations.
-* `INFERRED` — inferred through reasoning.
 * `ASSUMED` — assumed for control plane operation.
 * `UNKNOWN` — unknown or not observed.
 * `CONTRADICTED` — contradicted by subsequent evidence.
 * `STALE` — older than the staleness threshold.
+* `EXPIRED` — older than the expiration threshold.
 
-## Staleness
+## Staleness and Expiration
 
 Staleness must be explicitly represented.
 
 A stale observation must carry `epistemic_status = STALE`.
 
-Stale observations must not be treated as current physical truth.
+An expired observation must carry `epistemic_status = EXPIRED`.
+
+Stale and expired observations must not be treated as current physical truth.
+
+Freshness thresholds are provider-specific and defined by `FreshnessPolicy`.
 
 ## Unknown Representation
 

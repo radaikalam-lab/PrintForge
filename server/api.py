@@ -1,48 +1,36 @@
-from fastapi import FastAPI, Depends, HTTPException
-from fastapi.responses import JSONResponse
+from typing import Any
+
+from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
-from datetime import datetime, UTC
+
+from application.services import PrinterService, PrintJobService
 from domain.job import PrintJob, PrintJobState
-from domain.printer import Printer, PrinterState
-from domain.capabilities import PrinterCapabilities
-from domain.observation import PrinterObservation, EpistemicStatus
-from domain.execution import PrintExecution
-from domain.events import DomainEvent
-from application.services import PrintJobService, PrinterService
 from persistence.interfaces import (
-    PrintJobRepository,
-    PrinterRepository,
-    ExecutionRepository,
     EventRepository,
+    ExecutionRepository,
+    PrinterRepository,
+    PrintJobRepository,
 )
 from persistence.memory import (
-    InMemoryPrintJobRepository,
-    InMemoryPrinterRepository,
-    InMemoryExecutionRepository,
     InMemoryEventRepository,
+    InMemoryExecutionRepository,
+    InMemoryPrinterRepository,
+    InMemoryPrintJobRepository,
 )
 from providers.interfaces import (
-    PrinterDiscoveryProvider,
     PrinterCapabilityProvider,
+    PrinterDiscoveryProvider,
     PrinterObservationProvider,
     PrintSubmissionProvider,
-    PrintCancellationProvider,
     SpoolProvider,
 )
 from server.errors import (
-    PrintForgeError,
-    InvalidRequestError,
-    PrinterNotFoundError,
-    JobNotFoundError,
     InvalidStateTransitionError,
-    UnsupportedCapabilityError,
-    ProviderFailureError,
-    PolicyRejectionError,
-    PersistenceError,
+    JobNotFoundError,
+    PrinterNotFoundError,
+    PrintForgeError,
     map_to_http,
 )
-
 
 app = FastAPI(
     title="PrintForge API",
@@ -59,57 +47,57 @@ class PrinterModel(BaseModel):
     name: str
     protocol: str
     state: str
-    location: Optional[str] = None
+    location: str | None = None
 
 
 class PrinterCapabilitiesResponse(BaseModel):
     printer_id: str
-    capabilities: Dict[str, Any]
+    capabilities: dict[str, Any]
 
 
 class PrinterStatusResponse(BaseModel):
     printer_id: str
     status: str
     epistemic_status: str
-    timestamp: Optional[str] = None
-    retrieval_timestamp: Optional[str] = None
-    details: Optional[Dict[str, Any]] = None
+    timestamp: str | None = None
+    retrieval_timestamp: str | None = None
+    details: dict[str, Any] | None = None
 
 
 class JobModel(BaseModel):
     id: str
-    requested_printer: Optional[str] = None
-    resolved_printer: Optional[str] = None
-    document_format: Optional[str] = None
+    requested_printer: str | None = None
+    resolved_printer: str | None = None
+    document_format: str | None = None
     state: str
     copies: int = 1
     duplex: bool = False
     priority: int = 0
-    submission_time: Optional[str] = None
+    submission_time: str | None = None
 
 
 class JobCreateRequest(BaseModel):
     job_id: str
     source_document: str
     document_format: str
-    requested_printer: Optional[str] = None
+    requested_printer: str | None = None
     copies: int = 1
     duplex: bool = False
     priority: int = 0
-    requested_by: Optional[str] = None
+    requested_by: str | None = None
 
 
 class JobEventResponse(BaseModel):
     job_id: str
     timestamp: str
     event_type: str
-    provenance: Dict[str, Any] = Field(default_factory=dict)
+    provenance: dict[str, Any] = Field(default_factory=dict)
 
 
 class ErrorResponse(BaseModel):
     code: str
     message: str
-    details: Dict[str, Any] = Field(default_factory=dict)
+    details: dict[str, Any] = Field(default_factory=dict)
 
 
 # --- Dependency wiring ---
@@ -147,7 +135,7 @@ def get_submission_provider() -> PrintSubmissionProvider:
     raise NotImplementedError("Submission provider not wired in Phase 3")
 
 
-def get_spool_provider() -> Optional[SpoolProvider]:
+def get_spool_provider() -> SpoolProvider | None:
     return None
 
 
@@ -156,7 +144,7 @@ def get_print_job_service(
     execution_repo: ExecutionRepository = Depends(get_execution_repository),
     event_repo: EventRepository = Depends(get_event_repository),
     submission_provider: PrintSubmissionProvider = Depends(get_submission_provider),
-    spool_provider: Optional[SpoolProvider] = Depends(get_spool_provider),
+    spool_provider: SpoolProvider | None = Depends(get_spool_provider),
 ) -> PrintJobService:
     return PrintJobService(
         job_repository=job_repo,
@@ -199,7 +187,7 @@ async def not_implemented_error_handler(request, exc: NotImplementedError):
 # --- Versioned routes ---
 
 
-@app.get("/api/v1/printers", response_model=List[PrinterModel])
+@app.get("/api/v1/printers", response_model=list[PrinterModel])
 async def list_printers(service: PrinterService = Depends(get_printer_service)):
     printers = await service.discover_printers()
     return [
@@ -267,7 +255,7 @@ async def create_job(request: JobCreateRequest, service: PrintJobService = Depen
     )
 
 
-@app.get("/api/v1/jobs", response_model=List[JobModel])
+@app.get("/api/v1/jobs", response_model=list[JobModel])
 async def list_jobs(service: PrintJobService = Depends(get_print_job_service)):
     jobs = await service.list_jobs()
     return [
@@ -326,12 +314,12 @@ async def cancel_job(job_id: str, service: PrintJobService = Depends(get_print_j
     )
 
 
-@app.get("/api/v1/jobs/{job_id}/events", response_model=List[JobEventResponse])
+@app.get("/api/v1/jobs/{job_id}/events", response_model=list[JobEventResponse])
 async def get_job_events(job_id: str, service: PrintJobService = Depends(get_print_job_service)):
     events = await service.get_events(job_id)
     return [
         JobEventResponse(
-            job_id=e.job_id,
+            job_id=e.job_id,  # type: ignore[attr-defined]
             timestamp=e.timestamp.isoformat(),
             event_type=type(e).__name__,
             provenance=e.provenance,

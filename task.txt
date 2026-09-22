@@ -1,0 +1,1 @@
+Fix the CSP issue in my project configuration and allow 'unsafe-eval'

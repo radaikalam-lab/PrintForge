@@ -1,36 +1,24 @@
-from typing import Optional, List, Dict, Any
-from domain.job import PrintJob, PrintJobState
-from domain.printer import Printer, PrinterState
-from domain.capabilities import PrinterCapabilities
+from typing import Any
+
 from domain.events import DomainEvent, PrintJobCreated
 from domain.execution import PrintExecution
+from domain.job import PrintJob, PrintJobState
+from domain.printer import Printer
+from persistence.interfaces import (
+    EventRepository,
+    ExecutionRepository,
+    PrinterRepository,
+    PrintJobRepository,
+)
 from providers.interfaces import (
-    PrinterDiscoveryProvider,
     PrinterCapabilityProvider,
+    PrinterDiscoveryProvider,
     PrinterObservationProvider,
     PrintSubmissionProvider,
-    PrintCancellationProvider,
     SpoolProvider,
 )
-from persistence.interfaces import (
-    PrintJobRepository,
-    PrinterRepository,
-    ExecutionRepository,
-    EventRepository,
-)
-
-
 from server.errors import (
-    PrintForgeError,
-    InvalidRequestError,
     PrinterNotFoundError,
-    JobNotFoundError,
-    InvalidStateTransitionError,
-    UnsupportedCapabilityError,
-    ProviderFailureError,
-    PolicyRejectionError,
-    PersistenceError,
-    map_to_http,
 )
 
 
@@ -41,7 +29,7 @@ class PrintJobService:
         execution_repository: ExecutionRepository,
         event_repository: EventRepository,
         submission_provider: PrintSubmissionProvider,
-        spool_provider: Optional[SpoolProvider] = None,
+        spool_provider: SpoolProvider | None = None,
     ):
         self.job_repository = job_repository
         self.execution_repository = execution_repository
@@ -105,13 +93,13 @@ class PrintJobService:
         await self.event_repository.append(event)
         return job
 
-    async def get_job(self, job_id: str) -> Optional[PrintJob]:
+    async def get_job(self, job_id: str) -> PrintJob | None:
         return await self.job_repository.get(job_id)
 
-    async def list_jobs(self) -> List[PrintJob]:
+    async def list_jobs(self) -> list[PrintJob]:
         return await self.job_repository.list()
 
-    async def get_events(self, job_id: str) -> List[DomainEvent]:
+    async def get_events(self, job_id: str) -> list[DomainEvent]:
         return await self.event_repository.get_events_for_job(job_id)
 
 
@@ -130,7 +118,7 @@ class PrinterService:
         self.observation_provider = observation_provider
         self.event_repository = event_repository
 
-    async def discover_printers(self) -> List[Printer]:
+    async def discover_printers(self) -> list[Printer]:
         printers = await self.discovery_provider.discover()
         for printer in printers:
             await self.printer_repository.save(printer)
@@ -145,7 +133,7 @@ class PrinterService:
             await self.event_repository.append(event)
         return printers
 
-    async def get_capabilities(self, printer_id: str) -> Dict[str, Any]:
+    async def get_capabilities(self, printer_id: str) -> dict[str, Any]:
         printer = await self.printer_repository.get(printer_id)
         if not printer:
             raise PrinterNotFoundError(printer_id)
@@ -159,7 +147,7 @@ class PrinterService:
         await self.event_repository.append(event)
         return caps.model_dump()
 
-    async def get_status(self, printer_id: str) -> Dict[str, Any]:
+    async def get_status(self, printer_id: str) -> dict[str, Any]:
         printer = await self.printer_repository.get(printer_id)
         if not printer:
             raise PrinterNotFoundError(printer_id)

@@ -1,17 +1,15 @@
 import hashlib
-import os
 import json
-import asyncio
-from typing import Dict, Any, Optional, BinaryIO
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 
 class SpoolStore:
     def __init__(self, base_path: str = "./spool"):
         self.base_path = Path(base_path)
         self.base_path.mkdir(parents=True, exist_ok=True)
-        self._metadata: Dict[str, Dict[str, Any]] = {}
+        self._metadata: dict[str, dict[str, Any]] = {}
         self._load_metadata()
 
     def _artifact_path(self, artifact_id: str) -> Path:
@@ -23,7 +21,7 @@ class SpoolStore:
     def _load_metadata(self) -> None:
         path = self._metadata_path()
         if path.exists():
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 self._metadata = json.load(f)
 
     def _save_metadata(self) -> None:
@@ -34,7 +32,7 @@ class SpoolStore:
     def _compute_sha256(self, data: bytes) -> str:
         return hashlib.sha256(data).hexdigest()
 
-    async def store(self, artifact: bytes, metadata: Dict[str, Any]) -> str:
+    async def store(self, artifact: bytes, metadata: dict[str, Any]) -> str:
         artifact_id = self._compute_sha256(artifact)
         path = self._artifact_path(artifact_id)
         if path.exists():
@@ -75,7 +73,7 @@ class SpoolStore:
     async def exists(self, artifact_id: str) -> bool:
         return self._artifact_path(artifact_id).exists()
 
-    async def cleanup(self, max_age_seconds: Optional[int] = None) -> int:
+    async def cleanup(self, max_age_seconds: int | None = None) -> int:
         now = datetime.now(UTC)
         removed = 0
         for artifact_id in list(self._metadata.keys()):

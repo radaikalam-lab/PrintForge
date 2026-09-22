@@ -1,16 +1,17 @@
 import pytest
-from domain.state_machines import (
-    validate_job_transition,
-    validate_printer_transition,
-    VALID_JOB_TRANSITIONS,
-    VALID_PRINTER_TRANSITIONS,
-)
+
 from domain.job import PrintJobState
 from domain.printer import PrinterState
+from domain.state_machines import (
+    VALID_JOB_TRANSITIONS,
+    VALID_PRINTER_TRANSITIONS,
+    validate_job_transition,
+    validate_printer_transition,
+)
 
 
 def test_valid_job_transitions():
-    assert validate_job_transition(PrintJobState.CREATED, PrintJobState.VALIDATED) is None
+    validate_job_transition(PrintJobState.CREATED, PrintJobState.VALIDATED)
 
 
 def test_invalid_job_transition():
@@ -29,7 +30,7 @@ def test_job_transitions_are_explicit():
 
 
 def test_valid_printer_transitions():
-    assert validate_printer_transition(PrinterState.IDLE, PrinterState.PROCESSING) is None
+    validate_printer_transition(PrinterState.IDLE, PrinterState.PROCESSING)
 
 
 def test_invalid_printer_transition():

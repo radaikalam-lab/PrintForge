@@ -1,7 +1,8 @@
-from pydantic import BaseModel, Field
-from datetime import datetime, UTC
-from typing import Optional, Dict, Any, List
+from datetime import UTC, datetime
 from enum import Enum
+from typing import Any
+
+from pydantic import BaseModel, Field
 
 
 class PrintJobState(str, Enum):
@@ -13,30 +14,30 @@ class PrintJobState(str, Enum):
     PROCESSING = "PROCESSING"
     COMPLETED = "COMPLETED"
     VALIDATION_FAILED = "VALIDATION_FAILED"
-    REJECTED = "REJECTED"
     CANCELLED = "CANCELLED"
     FAILED = "FAILED"
-    UNKNOWN = "UNKNOWN"
+    BLOCKED = "BLOCKED"
+    ARCHIVED = "ARCHIVED"
 
 
 class PrintJob(BaseModel):
     job_id: str
     source_document: str
     document_format: str
-    requested_printer: Optional[str] = None
-    resolved_printer: Optional[str] = None
-    media: Optional[str] = None
-    page_size: Optional[str] = None
-    orientation: Optional[str] = None
+    requested_printer: str | None = None
+    resolved_printer: str | None = None
+    media: str | None = None
+    page_size: str | None = None
+    orientation: str | None = None
     copies: int = 1
     duplex: bool = False
-    color_mode: Optional[str] = None
-    resolution: Optional[str] = None
-    scaling: Optional[str] = None
-    page_range: Optional[str] = None
+    color_mode: str | None = None
+    resolution: str | None = None
+    scaling: str | None = None
+    page_range: str | None = None
     priority: int = 0
     submission_time: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    requested_by: Optional[str] = None
-    policy_context: Dict[str, Any] = Field(default_factory=dict)
+    requested_by: str | None = None
+    policy_context: dict[str, Any] = Field(default_factory=dict)
     state: PrintJobState = PrintJobState.CREATED
-    provenance: Dict[str, Any] = Field(default_factory=dict)
+    provenance: dict[str, Any] = Field(default_factory=dict)

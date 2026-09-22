@@ -1,7 +1,7 @@
 import logging
 import sys
-from typing import Optional
-from datetime import datetime, UTC
+from datetime import UTC, datetime
+from typing import Any
 
 
 def setup_logging(level: str = "INFO") -> None:
@@ -17,13 +17,13 @@ def get_logger(name: str) -> logging.Logger:
 
 
 class CorrelationContext:
-    def __init__(self, job_id: Optional[str] = None, printer_id: Optional[str] = None, execution_id: Optional[str] = None):
+    def __init__(self, job_id: str | None = None, printer_id: str | None = None, execution_id: str | None = None):
         self.job_id = job_id
         self.printer_id = printer_id
         self.execution_id = execution_id
         self.timestamp = datetime.now(UTC)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "job_id": self.job_id,
             "printer_id": self.printer_id,

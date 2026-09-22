@@ -1,12 +1,10 @@
-import pytest
-from domain.state_machines import validate_job_transition, validate_printer_transition
 from domain.job import PrintJobState
 from domain.printer import PrinterState
 
 
 def test_provider_failure_does_not_corrupt_domain():
-    from simulation.simulator import DeterministicPrinterSimulator
     from domain.job import PrintJob
+    from simulation.simulator import DeterministicPrinterSimulator
     simulator = DeterministicPrinterSimulator(seed=1)
     caps = type("Caps", (), {"color": True, "duplex": False, "supported_document_formats": ["pdf"], "supported_protocols": ["ipp"]})()
     printer = type("Printer", (), {"printer_id": "p1", "state": PrinterState.IDLE, "capabilities": caps})()

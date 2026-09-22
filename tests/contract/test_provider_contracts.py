@@ -1,13 +1,14 @@
 import pytest
+
 from providers.interfaces import (
-    PrinterDiscoveryProvider,
-    PrinterCapabilityProvider,
-    PrinterObservationProvider,
-    PrintSubmissionProvider,
-    PrintCancellationProvider,
-    SpoolProvider,
     DocumentTransformProvider,
+    PrintCancellationProvider,
+    PrinterCapabilityProvider,
+    PrinterDiscoveryProvider,
+    PrinterObservationProvider,
     PrintServerProvider,
+    PrintSubmissionProvider,
+    SpoolProvider,
 )
 
 

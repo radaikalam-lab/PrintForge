@@ -1,24 +1,34 @@
-import pytest
 import asyncio
+
+import pytest
+
 from application.services import PrintJobService
-from simulation.simulator import DeterministicPrinterSimulator
+from domain.capabilities import PrinterCapabilities
+from domain.execution import PrintExecution
 from domain.job import PrintJob, PrintJobState
 from domain.printer import Printer, PrinterState
-from domain.capabilities import PrinterCapabilities
-from domain.state_machines import validate_job_transition
 from persistence.memory import (
-    InMemoryPrintJobRepository,
-    InMemoryExecutionRepository,
     InMemoryEventRepository,
+    InMemoryExecutionRepository,
+    InMemoryPrintJobRepository,
 )
+from providers.interfaces import PrintSubmissionProvider
+from simulation.simulator import DeterministicPrinterSimulator
 
 
-class FakeSubmissionProvider:
+class FakeSubmissionProvider(PrintSubmissionProvider):
+    capability_declaration: dict = {}
+    supported_operations: list = []
+    version: str = "1.0.0"
+    deterministic_identity: str = "fake"
+    provenance: dict = {}
+
     def __init__(self):
         self.submitted: list = []
 
-    async def submit(self, job: PrintJob):
-        from domain.execution import PrintExecution, ExecutionState
+    async def submit(self, job: PrintJob) -> PrintExecution:
+        from domain.execution import ExecutionState
+
         execution = PrintExecution(
             execution_id=f"exec-{job.job_id}",
             job_id=job.job_id,
@@ -26,7 +36,7 @@ class FakeSubmissionProvider:
             provider="fake",
             requested_operation="submit",
             accepted=True,
-            execution_state=ExecutionState.ACCEPTED,
+            execution_state=ExecutionState.SUBMITTED,
             provenance={"fake": True},
         )
         self.submitted.append(execution)
@@ -51,7 +61,7 @@ def service():
         job_repository=InMemoryPrintJobRepository(),
         execution_repository=InMemoryExecutionRepository(),
         event_repository=InMemoryEventRepository(),
-        spool_provider=None,  # type: ignore
+        spool_provider=None,
         submission_provider=submission_provider,
     )
     return service, simulator, submission_provider
